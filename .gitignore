@@ -105,3 +105,4 @@ dist
 
 #Custom
 dbConfig.js
+authConfig.js
