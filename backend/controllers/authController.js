@@ -44,7 +44,7 @@ exports.signin = (req, res) => {
         });
       }
 
-      var token = jwt.sign({ id: user.id }, config.secret, {
+      var token = jwt.sign({ id: user.username }, config.secret, {
         expiresIn: 300,
       });
 
@@ -52,7 +52,7 @@ exports.signin = (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        accessToken: accessToken,
+        accessToken: token,
       });
     })
     .catch((err) => {

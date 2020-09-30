@@ -1,7 +1,7 @@
 const db = require("../models");
 const User = db.user;
 
-checkUsername = (req, res, next) => {
+checkDupUsername = (req, res, next) => {
   User.findOne({
     where: {
       username: req.body.username,
@@ -17,4 +17,4 @@ checkUsername = (req, res, next) => {
   });
 };
 
-module.exports = checkUsername;
+module.exports = checkDupUsername;

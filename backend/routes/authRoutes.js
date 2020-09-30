@@ -1,4 +1,4 @@
-const { checkEmail, checkUsername } = require("../middleware");
+const { checkEmail, checkDupUsername } = require("../middleware");
 const controller = require("../controllers/authController");
 
 module.exports = function (app) {
@@ -10,7 +10,11 @@ module.exports = function (app) {
     next();
   });
 
-  app.post("/api/auth/signup", [checkUsername, checkEmail], controller.signup);
+  app.post(
+    "/api/auth/signup",
+    [checkDupUsername, checkEmail],
+    controller.signup
+  );
 
   app.post("/api/auth/signin", controller.signin);
 };
