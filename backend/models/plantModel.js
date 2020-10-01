@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING,
     },
     description: {
-      type: Sequelize.BLOB,
+      type: Sequelize.TEXT,
     },
     water_interval: {
       type: Sequelize.INTEGER,

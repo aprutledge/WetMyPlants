@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const plantController = require("../controllers/plantController");
 const { authJwt } = require("../middleware");
+const { plant } = require("../models");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -21,4 +22,12 @@ module.exports = function (app) {
     authJwt.verifyToken,
     plantController.removePlant
   );
+
+  app.delete(
+    "/api/plants",
+    authJwt.verifyToken,
+    plantController.removeAllPlants
+  );
+
+  app.get("/api/plants", authJwt.verifyToken, plantController.getPlants);
 };

@@ -1,4 +1,4 @@
-const { user } = require("../models");
+const { user, sequelize, Sequelize } = require("../models");
 const db = require("../models");
 const Plant = db.plant;
 const User = db.user;
@@ -54,15 +54,59 @@ exports.removePlant = (req, res) => {
     },
   })
     .then((user) => {
-      Plant.destroy({
+      Plant.findOne({
         where: {
           plant_id: id,
         },
       })
         .then((plant) => {
+          if (plant.user_id !== user.user_id) {
+            return res
+              .status(500)
+              .send({ message: "You aren't the owner of this plant!" });
+          }
+
+          Plant.destroy({
+            where: {
+              plant_id: id,
+            },
+          })
+            .then((removedPlant) => {
+              return res.status(200).send({
+                plant_id: plant.plant_id,
+                message: "Plant deleted successfully.",
+              });
+            })
+            .catch((err) => {
+              return res.status(403).send({ message: err.message });
+            });
+        })
+        .catch((err) => {
+          return res.status(500).send({ message: err.message });
+        });
+    })
+    .catch((err) => {
+      return res.status(500).send({ message: err.message });
+    });
+};
+
+exports.removeAllPlants = (req, res) => {
+  User.findOne({
+    where: {
+      username: req.userId,
+    },
+  })
+    .then((user) => {
+      Plant.destroy({
+        where: {
+          user_id: user.user_id,
+        },
+      })
+        .then((plant) => {
+          console.log(plant);
           return res.status(200).send({
             plant_id: plant.plant_id,
-            message: "Plant deleted successfully.",
+            message: "Plants deleted successfully.",
           });
         })
         .catch((err) => {
@@ -73,4 +117,21 @@ exports.removePlant = (req, res) => {
       return res.status(500).send({ message: err.message });
     });
 };
-0;
+
+exports.updatePlant = (req, res) => {
+  // Todo
+};
+
+exports.getPlants = (req, res) => {
+  sequelize
+    .query(
+      "SELECT * FROM plants WHERE user_id = (SELECT user_id FROM users WHERE username = :user)",
+      { replacements: { user: req.userId }, type: sequelize.QueryTypes.SELECT }
+    )
+    .then((plants) => {
+      return res.status(200).send({ plants });
+    })
+    .catch((err) => {
+      return res.status(500).send({ message: err.message });
+    });
+};
