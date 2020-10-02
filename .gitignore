@@ -106,3 +106,4 @@ dist
 #Custom
 dbConfig.js
 authConfig.js
+.env
