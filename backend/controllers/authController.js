@@ -44,15 +44,27 @@ exports.signin = (req, res) => {
         });
       }
 
-      var token = jwt.sign({ id: user.username }, config.secret, {
-        expiresIn: 300,
-      });
+      const accessToken = jwt.sign(
+        { id: user.username },
+        config.accessTokenSecret,
+        {
+          expiresIn: "20m",
+        }
+      );
+
+      const refreshToken = jwt.sign(
+        { id: user.username },
+        config.refreshTokenSecret
+      );
+
+      // refreshTokens.push(refreshToken);
 
       res.status(200).send({
         id: user.id,
         username: user.username,
         email: user.email,
-        accessToken: token,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
       });
     })
     .catch((err) => {
