@@ -24,6 +24,7 @@ db.plant = require("./plantModel.js")(sequelize, Sequelize);
 db.fertilizerAlert = require("./fertilizerAlertModel.js")(sequelize, Sequelize);
 db.sunlightAlert = require("./sunlightAlertModal")(sequelize, Sequelize);
 db.waterAlert = require("./waterAlertModel.js")(sequelize, Sequelize);
+db.token = require("./tokenModel")(sequelize, Sequelize);
 
 //db.user.hasMany(db.plant, { foreignKey: "plant_id" });
 db.plant.belongsTo(db.user, { foreignKey: "user_id" });

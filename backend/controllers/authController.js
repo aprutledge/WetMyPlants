@@ -1,11 +1,23 @@
+require("dotenv").config();
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
 const db = require("../models");
 const config = require("../config/authConfig");
 const User = db.user;
+const Token = db.token;
 
 const Op = db.Sequelize.Op;
 
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
+function createAccessToken(user) {
+  return jwt.sign({ id: user }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "20m",
+  });
+}
+
+function createRefreshToken(user) {
+  return jwt.sign({ id: user }, process.env.REFRESH_TOKEN_SECRET);
+}
 
 exports.signup = (req, res) => {
   User.create({
@@ -44,22 +56,18 @@ exports.signin = (req, res) => {
         });
       }
 
-      const accessToken = jwt.sign(
-        { id: user.username },
-        config.accessTokenSecret,
-        {
-          expiresIn: "20m",
-        }
-      );
-
-      const refreshToken = jwt.sign(
-        { id: user.username },
-        config.refreshTokenSecret
-      );
-
       // refreshTokens.push(refreshToken);
 
-      res.status(200).send({
+      const accessToken = createAccessToken(user.username);
+      const refreshToken = createRefreshToken(user.username);
+
+      Token.create({
+        refresh_token: refreshToken,
+      })
+        .then({})
+        .catch({});
+
+      return res.status(200).send({
         id: user.id,
         username: user.username,
         email: user.email,
@@ -68,6 +76,56 @@ exports.signin = (req, res) => {
       });
     })
     .catch((err) => {
+      return res.status(500).send({ message: err.message });
+    });
+};
+
+exports.refresh = (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  if (refreshToken == null) return res.sendStatus(401);
+  Token.findOne({
+    refresh_token: refreshToken,
+  })
+    .then((token) => {
+      if (token == null) {
+        return res
+          .status(403)
+          .send({ message: "Token does not exist or has expired." });
+      }
+
+      jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+        (err, user) => {
+          if (err) return res.sendStatus(403);
+          const accessToken = createAccessToken({ id: user });
+
+          return res.status(200).send({
+            accessToken: accessToken,
+          });
+        }
+      );
+    })
+    .catch((err) => {
       res.status(500).send({ message: err.message });
+    });
+};
+
+exports.signout = (req, res) => {
+  if (req.body.refreshToken == null) return res.sendStatus(401);
+
+  Token.destroy({
+    where: {
+      refresh_token: req.body.refreshToken,
+    },
+  })
+    .then((token) => {
+      if (token == null)
+        return res.status(404).send({ message: "Token not found." });
+
+      return res.status(200).send({ message: "Token deleted." });
+    })
+    .catch((err) => {
+      return res.status(500).send({ message: err.message });
     });
 };
