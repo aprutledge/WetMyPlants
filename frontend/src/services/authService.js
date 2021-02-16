@@ -42,15 +42,25 @@ const getCurrentUser = () => {
 };
 
 const refresh = () => {
+  console.log("Hello from refresh");
   //TODO make sure this gets the request token properly
-  refreshToken = JSON.parse(localStorage.getItem(APP_PREFIX + "user"));
+  let data = JSON.parse(localStorage.getItem(APP_PREFIX + "user"));
+  let refreshToken = "";
+  if (data !== null) {
+    refreshToken = data.refreshToken;
+  }
   //TODO check response and set new access token in local storage
-  axios
+  return axios
     .post(API_URL + "token", {
       refreshToken,
     })
     .then((response) => {
-      localStorage.setItem(APP_PREFIX + "user");
+      data.accessToken = response.data.accessToken;
+      localStorage.setItem(APP_PREFIX + "user", JSON.stringify(data));
+      return response.data;
+    })
+    .catch((err) => {
+      console.log(err);
     });
 };
 
