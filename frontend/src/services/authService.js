@@ -41,9 +41,23 @@ const getCurrentUser = () => {
   return JSON.parse(localStorage.getItem(APP_PREFIX + "user"));
 };
 
+const refresh = () => {
+  //TODO make sure this gets the request token properly
+  refreshToken = JSON.parse(localStorage.getItem(APP_PREFIX + "user"));
+  //TODO check response and set new access token in local storage
+  axios
+    .post(API_URL + "token", {
+      refreshToken,
+    })
+    .then((response) => {
+      localStorage.setItem(APP_PREFIX + "user");
+    });
+};
+
 export default {
   register,
   login,
   logout,
   getCurrentUser,
+  refresh,
 };

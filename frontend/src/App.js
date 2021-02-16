@@ -1,55 +1,67 @@
 import React, { useState, useEffect } from "react";
 //import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
-import { Card, Nav } from "react-bootstrap";
+import { Nav, Navbar } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
-import Login from "./components/Login";
-import Register from "./components/Register";
+import Routes from "./Routes";
+import { AuthContext } from "./contexts/AuthContext";
+import AuthService from "./services/authService";
 
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("#login");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const updateLoginStatus = (status) => {
-    setIsLoggedIn(status);
-    console.log("switching logged in to: " + status);
+  useEffect(() => {
+    onLoad();
+  }, []);
+
+  const onLoad = () => {
+    AuthService.refresh()
+      .then(() => {
+        setIsAuthenticated(true);
+      })
+      .catch((err) => {
+        if (err !== "No current user") {
+          alert(err);
+        }
+      });
+  };
+
+  const handleLogout = () => {
+    AuthService.logout();
+    setIsAuthenticated(false);
   };
 
   return (
-    <>
-      <div className="app-title">Wet My Plants</div>
-      <div>
-        {isLoggedIn ? (
-          <div>Hello Logged In User</div>
-        ) : (
-          <Card className="login-card">
-            <Card.Header className="login-header">
-              <Nav
-                variant="pills"
-                defaultActiveKey="#login"
-                onSelect={(selectedKey) => setSelectedTab(selectedKey)}
-              >
-                <Nav.Item>
-                  <Nav.Link href="#login">Login</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="#register">Register</Nav.Link>
-                </Nav.Item>
-              </Nav>
-            </Card.Header>
-            <Card.Body>
-              {selectedTab === "#login" ? (
-                <Login updateLoginStatus={updateLoginStatus} />
-              ) : (
-                <Register updateLoginStatus={updateLoginStatus} />
-              )}
-            </Card.Body>
-          </Card>
-        )}
-      </div>
-    </>
+    <div className="App container py-3">
+      <Navbar collapseOnSelect bg="light" expand="md" className="mb-3">
+        <Navbar.Brand className="font-weight-bold text-muted">
+          WetMyPlants
+        </Navbar.Brand>
+        <Navbar.Toggle />
+        <Navbar.Collapse className="justify-content-end">
+          <Nav activeKey={window.location.pathname}>
+            {isAuthenticated ? (
+              <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+            ) : (
+              <>
+                <LinkContainer to="/register">
+                  <Nav.Link href="/register">Register</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/login">
+                  <Nav.Link href="/login">Login</Nav.Link>
+                </LinkContainer>
+              </>
+            )}
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+      <AuthContext.Provider value={{ isAuthenticated, setIsAuthenticated }}>
+        <Routes />
+      </AuthContext.Provider>
+    </div>
   );
 };
 

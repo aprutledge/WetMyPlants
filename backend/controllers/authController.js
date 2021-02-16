@@ -84,7 +84,9 @@ exports.refresh = (req, res) => {
   const refreshToken = req.body.refreshToken;
   if (refreshToken == null) return res.sendStatus(401);
   Token.findOne({
-    refresh_token: refreshToken,
+    where: {
+      refresh_token: refreshToken,
+    },
   })
     .then((token) => {
       if (token == null) {

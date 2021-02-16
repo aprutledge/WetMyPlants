@@ -107,3 +107,4 @@ dist
 dbConfig.js
 authConfig.js
 .env
+.dat
