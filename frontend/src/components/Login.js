@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { useHistory } from "react-router-dom";
 
 import AuthService from "../services/authService";
 import { useAuth } from "../contexts/AuthContext";
@@ -8,6 +9,7 @@ import "./Login.css";
 
 const Login = (props) => {
   const { setIsAuthenticated } = useAuth();
+  const history = useHistory();
 
   const onChangePassword = (e) => {
     const password = e.target.value;
@@ -25,6 +27,7 @@ const Login = (props) => {
       .then((response) => {
         console.log(response);
         setIsAuthenticated(true);
+        history.push("/");
       })
       .catch((err) => {
         //console.log(err);

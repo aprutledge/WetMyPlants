@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-//import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { Nav, Navbar } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
@@ -13,6 +13,7 @@ import AuthService from "./services/authService";
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(true);
+  const history = useHistory();
 
   useEffect(() => {
     onLoad();
@@ -38,6 +39,7 @@ const App = () => {
   const handleLogout = () => {
     AuthService.logout();
     setIsAuthenticated(false);
+    history.push("/login");
   };
 
   return (

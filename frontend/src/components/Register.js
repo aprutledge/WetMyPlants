@@ -1,9 +1,16 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import { useHistory } from "react-router-dom";
 
 import AuthService from "../services/authService";
+import { useAuth } from "../contexts/AuthContext";
+
+import "./Register.css";
 
 const Register = (props) => {
+  const { setIsAuthenticated } = useAuth();
+  const history = useHistory();
+
   const onChangePassword = (e) => {
     const password = e.target.value;
     setPassword(password);
@@ -26,11 +33,12 @@ const Register = (props) => {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    //props.updateLoginStatus();
     console.log(username + ": " + password);
     AuthService.register(username, email, password)
-      .then(() => {
-        //setIsLoggedIn = true;
+      .then((response) => {
+        console.log(response);
+        setIsAuthenticated(true);
+        history.push("/");
       })
       .catch((err) => {
         console.log(err);
@@ -44,7 +52,7 @@ const Register = (props) => {
   return (
     <div className="Register">
       <Form onSubmit={handleRegister}>
-        <Form.Group controlId="formBasicUsername">
+        <Form.Group size="lg" controlId="formBasicUsername">
           <Form.Label>Username</Form.Label>
           <Form.Control
             type="username"
@@ -53,7 +61,7 @@ const Register = (props) => {
           />
         </Form.Group>
 
-        <Form.Group controlId="formBasicEmail">
+        <Form.Group size="lg" controlId="formBasicEmail">
           <Form.Label>Email</Form.Label>
           <Form.Control
             type="email"
@@ -62,7 +70,7 @@ const Register = (props) => {
           />
         </Form.Group>
 
-        <Form.Group controlId="formBasicPassword">
+        <Form.Group size="lg" controlId="formBasicPassword">
           <Form.Label>Password</Form.Label>
           <Form.Control
             type="password"
@@ -71,7 +79,7 @@ const Register = (props) => {
           />
         </Form.Group>
 
-        <Form.Group controlId="formBasicConfirmPassword">
+        <Form.Group size="lg" controlId="formBasicConfirmPassword">
           <Form.Label>Confirm Password</Form.Label>
           <Form.Control
             type="confirmPassword"

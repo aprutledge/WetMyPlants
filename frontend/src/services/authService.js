@@ -34,7 +34,7 @@ const login = (username, password) => {
 };
 
 const logout = () => {
-  localStorage.removeItem("user");
+  localStorage.removeItem(APP_PREFIX + "user");
 };
 
 const getCurrentUser = () => {
@@ -42,14 +42,12 @@ const getCurrentUser = () => {
 };
 
 const refresh = () => {
-  console.log("Hello from refresh");
-  //TODO make sure this gets the request token properly
+  //console.log("Hello from refresh");
   let data = JSON.parse(localStorage.getItem(APP_PREFIX + "user"));
   let refreshToken = "";
   if (data !== null) {
     refreshToken = data.refreshToken;
   }
-  //TODO check response and set new access token in local storage
   return axios
     .post(API_URL + "token", {
       refreshToken,
@@ -64,7 +62,7 @@ const refresh = () => {
       return response.data;
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
       return err.message;
     });
 };
