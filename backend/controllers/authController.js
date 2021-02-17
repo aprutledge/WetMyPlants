@@ -82,7 +82,10 @@ exports.signin = (req, res) => {
 
 exports.refresh = (req, res) => {
   const refreshToken = req.body.refreshToken;
-  if (refreshToken == null) return res.sendStatus(401);
+  if (refreshToken === "")
+    return res
+      .status(200)
+      .send({ message: "No refresh token.", accessToken: null });
   Token.findOne({
     where: {
       refresh_token: refreshToken,
@@ -99,10 +102,14 @@ exports.refresh = (req, res) => {
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         (err, user) => {
-          if (err) return res.sendStatus(403);
+          if (err)
+            return res
+              .status(403)
+              .send({ message: "Token is expired or does not exist." });
           const accessToken = createAccessToken({ id: user });
 
           return res.status(200).send({
+            message: "Refresh token accepted",
             accessToken: accessToken,
           });
         }

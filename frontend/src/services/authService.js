@@ -55,12 +55,17 @@ const refresh = () => {
       refreshToken,
     })
     .then((response) => {
-      data.accessToken = response.data.accessToken;
+      if (refreshToken === "") {
+        throw new Error("No current user");
+      } else {
+        data.accessToken = response.data.accessToken;
+      }
       localStorage.setItem(APP_PREFIX + "user", JSON.stringify(data));
       return response.data;
     })
     .catch((err) => {
       console.log(err);
+      return err.message;
     });
 };
 

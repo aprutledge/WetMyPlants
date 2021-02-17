@@ -22,7 +22,9 @@ const App = () => {
     AuthService.refresh()
       .then((data) => {
         console.log(data);
-        setIsAuthenticated(true);
+        if (data !== "No current user") {
+          setIsAuthenticated(true);
+        }
       })
       .catch((err) => {
         if (err !== "No current user") {
