@@ -21,7 +21,7 @@ const App = () => {
   const onLoad = () => {
     AuthService.refresh()
       .then((data) => {
-        console.log(data);
+        //console.log(data);
         if (data !== "No current user") {
           setIsAuthenticated(true);
         }
