@@ -6,10 +6,16 @@ const db = require("./models");
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:8081",
+  origin: ["http://localhost:8081"],
 };
 
 app.use(cors(corsOptions));
+
+app.set("etag", false);
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
 
 app.use(bodyParser.json());
 

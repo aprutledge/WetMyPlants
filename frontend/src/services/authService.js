@@ -34,7 +34,23 @@ const login = (username, password) => {
 };
 
 const logout = () => {
-  localStorage.removeItem(APP_PREFIX + "user");
+  //TODO get request body working and delete form local storage after
+  let data = JSON.parse(localStorage.getItem(APP_PREFIX + "user"));
+  let refreshToken = "";
+
+  if (data !== null) {
+    refreshToken = data.refreshToken;
+  }
+  axios
+    .patch(API_URL + "logout", {
+      refreshToken,
+    })
+    .then((response) => {
+      localStorage.removeItem(APP_PREFIX + "user");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 const getCurrentUser = () => {
@@ -42,27 +58,24 @@ const getCurrentUser = () => {
 };
 
 const refresh = () => {
-  //console.log("Hello from refresh");
+  console.log("Hello from refresh");
   let data = JSON.parse(localStorage.getItem(APP_PREFIX + "user"));
   let refreshToken = "";
   if (data !== null) {
     refreshToken = data.refreshToken;
+  } else {
+    //TODO implement something
   }
   return axios
     .post(API_URL + "token", {
       refreshToken,
     })
     .then((response) => {
-      if (refreshToken === "") {
-        throw new Error("No current user");
-      } else {
-        data.accessToken = response.data.accessToken;
-      }
+      data.accessToken = response.data.accessToken;
       localStorage.setItem(APP_PREFIX + "user", JSON.stringify(data));
       return response.data;
     })
     .catch((err) => {
-      //console.log(err);
       return err.message;
     });
 };

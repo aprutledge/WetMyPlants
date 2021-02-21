@@ -11,12 +11,14 @@ const Op = db.Sequelize.Op;
 
 function createAccessToken(user) {
   return jwt.sign({ id: user }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "20m",
+    expiresIn: "1h",
   });
 }
 
 function createRefreshToken(user) {
-  return jwt.sign({ id: user }, process.env.REFRESH_TOKEN_SECRET);
+  return jwt.sign({ id: user }, process.env.REFRESH_TOKEN_SECRET, {
+    expiresIn: "24h",
+  });
 }
 
 exports.signup = (req, res) => {
@@ -66,7 +68,6 @@ exports.signin = (req, res) => {
       })
         .then({})
         .catch({});
-
       return res.status(200).send({
         id: user.id,
         username: user.username,
@@ -80,6 +81,7 @@ exports.signin = (req, res) => {
     });
 };
 
+//TODO Verify that this does what I want it to do
 exports.refresh = (req, res) => {
   const refreshToken = req.body.refreshToken;
   if (refreshToken === "")
@@ -101,13 +103,12 @@ exports.refresh = (req, res) => {
       jwt.verify(
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
-        (err, user) => {
+        (err, decoded) => {
           if (err)
             return res
               .status(403)
               .send({ message: "Token is expired or does not exist." });
-          const accessToken = createAccessToken({ id: user });
-
+          const accessToken = createAccessToken(decoded.id);
           return res.status(200).send({
             message: "Refresh token accepted",
             accessToken: accessToken,
@@ -116,12 +117,13 @@ exports.refresh = (req, res) => {
       );
     })
     .catch((err) => {
+      console.log("it broke?");
       res.status(500).send({ message: err.message });
     });
 };
 
 exports.signout = (req, res) => {
-  if (req.body.refreshToken == null) return res.sendStatus(401);
+  if (req.body.refreshToken === null) return res.sendStatus(401);
 
   Token.destroy({
     where: {

@@ -39,7 +39,7 @@ const App = () => {
   const handleLogout = () => {
     AuthService.logout();
     setIsAuthenticated(false);
-    history.push("/login");
+    history.push("/");
   };
 
   return (

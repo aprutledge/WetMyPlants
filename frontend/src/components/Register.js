@@ -38,7 +38,7 @@ const Register = (props) => {
       .then((response) => {
         console.log(response);
         setIsAuthenticated(true);
-        history.push("/");
+        history.push("/dashboard");
       })
       .catch((err) => {
         console.log(err);

@@ -25,9 +25,8 @@ const Login = (props) => {
     e.preventDefault();
     AuthService.login(username, password)
       .then((response) => {
-        console.log(response);
         setIsAuthenticated(true);
-        history.push("/");
+        history.push("/dashboard");
       })
       .catch((err) => {
         //console.log(err);

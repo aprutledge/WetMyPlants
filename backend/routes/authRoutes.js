@@ -20,5 +20,5 @@ module.exports = function (app) {
 
   app.post("/api/auth/token", controller.refresh);
 
-  app.delete("/api/auth/logout", controller.signout);
+  app.patch("/api/auth/logout", controller.signout);
 };

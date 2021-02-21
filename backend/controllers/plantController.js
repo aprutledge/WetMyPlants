@@ -132,6 +132,7 @@ exports.getPlants = (req, res) => {
       return res.status(200).send({ plants });
     })
     .catch((err) => {
+      console.log(err.message);
       return res.status(500).send({ message: err.message });
     });
 };
